@@ -2,7 +2,7 @@
   "name": "personal-calendar",
   "version": "1.0.0",
   "description": "I wanted a more personalized experience so I created my own calendar",
-  "main": "calender.js",
+  "main": "src/calender.js",
   "scripts": {
     "tsc": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
