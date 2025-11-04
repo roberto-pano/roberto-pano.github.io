@@ -6,18 +6,19 @@ import {resolve} from 'path';
 export default defineConfig({
   plugins: [react()],
   root: resolve(__dirname),
-  base: '',
+  base: '/',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
     assetsDir: 'assets',
     cssCodeSplit: true,
-    sourcemap: true,
+    sourcemap: false,
+    minify: 'terser',
     rollupOptions: {
       input: resolve(__dirname, 'index.html'),
       output: {
         entryFileNames: 'assets/[name].[hash].js',
-        chunkFileNames: 'assets/chunks/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
         assetFileNames: ({name}) => {
           if (/\.(css)$/.test(name ?? '')) {
             return 'assets/css/[name].[hash][extname]';

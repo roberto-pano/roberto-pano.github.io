@@ -2,32 +2,33 @@
   command = "npm run build:web"
   publish = "site/dist"
 
-# Asset MIME types
-[[headers]]
-  for = "/*.js"
-  [headers.values]
-    Content-Type = "application/javascript"
-    X-Content-Type-Options = "nosniff"
+# Rewrite rules for assets first
+[[redirects]]
+  from = "/assets/*"
+  to = "/assets/:splat"
+  status = 200
 
-[[headers]]
-  for = "/*.css"
-  [headers.values]
-    Content-Type = "text/css"
-    X-Content-Type-Options = "nosniff"
-
+# Asset type headers
 [[headers]]
   for = "/assets/*.js"
   [headers.values]
+    Cache-Control = "public, max-age=31536000"
     Content-Type = "application/javascript"
     X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/assets/*.css"
   [headers.values]
+    Cache-Control = "public, max-age=31536000"
     Content-Type = "text/css"
     X-Content-Type-Options = "nosniff"
 
-# This redirect should be last
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# SPA fallback - must be last
 [[redirects]]
   from = "/*"
   to = "/index.html"
