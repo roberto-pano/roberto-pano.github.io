@@ -16,18 +16,9 @@ function ensureDir(dir) {
 }
 
 function shouldCopy(file) {
-  // Only copy image files, CSS, and JS
+  // Only copy image files
   const ext = path.extname(file).toLowerCase();
-  const allowedExtensions = [
-    '.jpg',
-    '.jpeg',
-    '.png',
-    '.gif',
-    '.svg',
-    '.ico',
-    '.css',
-    '.js',
-  ];
+  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico'];
 
   // Skip hidden files and config files
   if (
