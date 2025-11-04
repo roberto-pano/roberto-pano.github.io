@@ -63,14 +63,23 @@ export default function Header() {
 
   const isActive = useCallback(
     (path: string) => {
-      return location.pathname === path;
+      if (Platform.OS === 'web') {
+        return location.pathname === path;
+      }
+      // For native platforms, compare the route name
+      return location.pathname.replace('/', '') === path.replace('/', '');
     },
     [location],
   );
 
   const handlePress = useCallback(
     (path: string) => {
-      navigate(path);
+      if (Platform.OS === 'web') {
+        navigate(path);
+      } else {
+        // For native platforms, use the simplified path
+        navigate(path.replace('/', ''));
+      }
     },
     [navigate],
   );
