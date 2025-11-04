@@ -8,9 +8,9 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "dev:web": "vite --config site/vite.config.ts",
-    "build:web": "vite build --config site/vite.config.ts",
-    "preview:web": "vite preview --config site/vite.config.ts",
+    "dev:web": "cd site && vite",
+    "build:web": "cd site && vite build",
+    "preview:web": "cd site && vite preview",
     "copy:assets": "node ./scripts/copy-oldsite-assets.js"
   },
   "dependencies": {
