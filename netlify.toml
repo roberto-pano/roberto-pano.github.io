@@ -2,13 +2,20 @@
   command = "npm run build:web"
   publish = "site/dist"
 
-# Rewrite rules for assets first
-[[redirects]]
-  from = "/assets/*"
-  to = "/assets/:splat"
-  status = 200
+# Image type headers first
+[[headers]]
+  for = "/*.{jpg,jpeg,png,gif,svg,webp}"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+    Content-Type = "image/jpeg"
 
-# Asset type headers
+[[headers]]
+  for = "/assets/*.{jpg,jpeg,png,gif,svg,webp}"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+    Content-Type = "image/jpeg"
+
+# JS and CSS headers
 [[headers]]
   for = "/assets/*.js"
   [headers.values]
@@ -23,12 +30,13 @@
     Content-Type = "text/css"
     X-Content-Type-Options = "nosniff"
 
-[[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000"
+# Serve the actual files first
+[[redirects]]
+  from = "/assets/*"
+  to = "/assets/:splat"
+  status = 200
 
-# SPA fallback - must be last
+# SPA fallback for everything else
 [[redirects]]
   from = "/*"
   to = "/index.html"

@@ -1,7 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 
-const srcRoot = path.resolve(__dirname, '..', 'cosmic-pony', 'old-site');
+const srcRoot = path.resolve(
+  __dirname,
+  '..',
+  'cosmic-pony',
+  'old-site-archived',
+);
 const destRoot = path.resolve(__dirname, '..', 'site', 'assets');
 
 function ensureDir(dir) {
