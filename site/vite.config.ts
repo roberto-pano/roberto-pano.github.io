@@ -6,17 +6,25 @@ import {resolve} from 'path';
 export default defineConfig({
   plugins: [react()],
   root: resolve(__dirname),
-  base: '/',
+  base: './',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    assetsDir: 'assets',
     rollupOptions: {
       input: resolve(__dirname, 'index.html'),
       output: {
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]',
+        manualChunks: {
+          'vendor': ['react', 'react-dom', 'react-router-dom'],
+        },
       },
+    },
+    manifest: true,
+    modulePreload: {
+      polyfill: true,
     },
   },
   resolve: {
