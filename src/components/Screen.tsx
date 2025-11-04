@@ -10,7 +10,7 @@ interface ScreenProps {
 export default function Screen({title, children}: ScreenProps) {
   return (
     <View style={styles.container}>
-  <Header title={title} />
+      <Header title={title} />
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.contentContainer}>
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     ...Platform.select({
-      web: { marginLeft: 240 },
+      web: {marginLeft: 240},
       default: {},
     }),
   },

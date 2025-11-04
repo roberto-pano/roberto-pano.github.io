@@ -1,5 +1,12 @@
 import React from 'react';
-import {View, Text, StyleSheet, Pressable, Platform, Linking} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Platform,
+  Linking,
+} from 'react-native';
 import Screen from '../components/Screen';
 
 import {useNavigate} from 'react-router-dom';

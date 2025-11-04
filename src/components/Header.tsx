@@ -17,7 +17,7 @@ const routes = [
   {name: 'Contact', path: '/contact'},
 ];
 
-export default function Header({ title }: { title?: string }) {
+export default function Header({title}: {title?: string}) {
   const navigate = useNavigate();
   const location = useLocation();
 
