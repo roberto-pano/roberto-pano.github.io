@@ -8,8 +8,10 @@ export default defineConfig({
   resolve: {
     alias: {
       'react-native': 'react-native-web',
-      '@react-native-async-storage/async-storage':
-        'react-native-web/dist/exports/AsyncStorage',
+      '@react-native-async-storage/async-storage': resolve(
+        __dirname,
+        'src/shims/async-storage-web.js',
+      ),
     },
     extensions: [
       '.web.tsx',
@@ -35,11 +37,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
       },
-      external: [
-        'react-native-safe-area-context',
-        'react-native-screens',
-        '@react-native-async-storage/async-storage',
-      ],
+      external: ['react-native-safe-area-context', 'react-native-screens'],
     },
     commonjsOptions: {
       transformMixedEsModules: true,
@@ -50,6 +48,7 @@ export default defineConfig({
       'react-native-web',
       'react-native-safe-area-context',
       'react-native-screens',
+      '@react-native-async-storage/async-storage',
     ],
     esbuildOptions: {
       mainFields: ['module', 'main'],
