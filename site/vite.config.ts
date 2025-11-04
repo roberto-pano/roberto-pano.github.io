@@ -27,7 +27,7 @@ export default defineConfig({
           }
           return 'assets/[name].[hash][extname]';
         },
-        manualChunks: (id) => {
+        manualChunks: id => {
           if (id.includes('node_modules')) {
             if (id.includes('react')) {
               return 'vendor-react';
