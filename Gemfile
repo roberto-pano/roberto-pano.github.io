@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '3.1.4' # Match Netlify's Ruby version exactly
+ruby '3.2.2' # Latest supported version that maintains compatibility
 
 # Pin problematic dependencies to compatible versions
 gem 'ffi', '1.15.5'  # Last version that works with RubyGems 3.1.4
