@@ -7,7 +7,7 @@ const srcRoot = path.resolve(
   'cosmic-pony',
   'old-site-archived',
 );
-const destRoot = path.resolve(__dirname, '..', 'site', 'assets');
+const destRoot = path.resolve(__dirname, '..', 'site', 'public', 'assets');
 
 function ensureDir(dir) {
   if (!fs.existsSync(dir)) {
@@ -16,12 +16,30 @@ function ensureDir(dir) {
 }
 
 function shouldCopy(file) {
-  // Skip HTML files; copy everything else (images, css, js, folders)
+  // Only copy image files, CSS, and JS
   const ext = path.extname(file).toLowerCase();
-  if (ext === '.html' || ext === '.htm') {
+  const allowedExtensions = [
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.gif',
+    '.svg',
+    '.ico',
+    '.css',
+    '.js',
+  ];
+
+  // Skip hidden files and config files
+  if (
+    file.startsWith('.') ||
+    file.includes('package.json') ||
+    file.includes('tsconfig') ||
+    file.includes('eslint')
+  ) {
     return false;
   }
-  return true;
+
+  return allowedExtensions.includes(ext);
 }
 
 function copyRecursive(srcDir, destDir) {
