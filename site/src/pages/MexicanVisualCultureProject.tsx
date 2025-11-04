@@ -1,4 +1,6 @@
 import React, {useState} from 'react';
+import styles from './MexicanVisualCultureProject.module.css';
+import modalStyles from './Modal.module.css';
 
 const IMAGES = [
   {
@@ -103,48 +105,48 @@ export default function MexicanVisualCultureProject() {
   }
 
   return (
-    <div>
-      <h2 style={{textAlign: 'center', marginBottom: 24}}>
+    <div className={styles.galleryContainer}>
+      <h2 style={{textAlign: 'center', marginBottom: '24px'}}>
         Virtual Art Exhibit
       </h2>
-      <p style={{textAlign: 'center', marginBottom: 24}}>
+      <p style={{textAlign: 'center', marginBottom: '24px'}}>
         The theme of the overall exhibit is an exploration into dual identity
         and how Mexican-American and Chicano/a/x artists express identity
         through various mediums and art styles.
       </p>
 
-      <div className="gallery">
+      <div className={styles.galleryGrid}>
         {IMAGES.map((img, idx) => (
-          <div className="gallery-item" key={idx}>
-            <div className="title">{img.title || img.alt}</div>
+          <div className={styles.galleryItem} key={idx}>
             <img
               src={img.src}
               alt={img.alt}
-              className="gallery-img"
+              className={styles.galleryImage}
               onClick={() => openModal(img)}
               style={{cursor: 'pointer'}}
             />
-            <div className="description">{img.description}</div>
+            <div className={styles.galleryContent}>
+              <h3 className={styles.galleryTitle}>{img.title || img.alt}</h3>
+              <p className={styles.galleryDescription}>{img.description}</p>
+            </div>
           </div>
         ))}
       </div>
 
       <div
-        id="myModal"
-        className={`modal ${modalOpen ? 'show' : ''}`}
+        className={`${modalStyles.modal} ${modalOpen ? modalStyles.show : ''}`}
         onClick={closeModal}>
-        <span className="close" onClick={closeModal}>
+        <span className={modalStyles.modalClose} onClick={closeModal}>
           &times;
         </span>
         {modalOpen && (
           <img
-            className="modal-content"
-            id="img01"
+            className={modalStyles.modalContent}
             src={modalSrc}
             alt={modalAlt}
           />
         )}
-        <div id="caption">{modalAlt}</div>
+        <div className={modalStyles.modalCaption}>{modalAlt}</div>
       </div>
     </div>
   );

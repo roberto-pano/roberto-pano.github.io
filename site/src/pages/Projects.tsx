@@ -3,8 +3,7 @@ import React from 'react';
 export default function Projects() {
   function goToSwe() {
     // same behavior as the original site: navigate to the external software-engineer projects
-    window.location.href =
-      'http://ec2-50-16-177-186.compute-1.amazonaws.com/~roberto/';
+    window.location.href = 'https://github.com/roberto-pano';
   }
 
   return (
