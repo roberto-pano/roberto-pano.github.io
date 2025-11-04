@@ -8,7 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {useNavigate, useLocation} from 'react-router-dom';
 
 const routes = [
   {name: 'Home', path: '/'},
@@ -18,8 +18,8 @@ const routes = [
 ];
 
 export default function Header() {
-  const navigation = useNavigation();
-  const route = useRoute();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleResponse = useCallback((response: string) => {
     const s = response.toLowerCase();
@@ -63,23 +63,16 @@ export default function Header() {
 
   const isActive = useCallback(
     (path: string) => {
-      if (Platform.OS === 'web' && typeof window !== 'undefined') {
-        return window.location.pathname === path;
-      }
-      return route.name === path.replace('/', '');
+      return location.pathname === path;
     },
-    [route.name],
+    [location],
   );
 
   const handlePress = useCallback(
     (path: string) => {
-      if (Platform.OS === 'web' && typeof window !== 'undefined') {
-        window.history.pushState({}, '', path);
-      } else {
-        navigation.navigate(path.replace('/', '') as never);
-      }
+      navigate(path);
     },
-    [navigation],
+    [navigate],
   );
 
   return (

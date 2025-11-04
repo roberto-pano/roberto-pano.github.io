@@ -8,11 +8,6 @@ export default defineConfig({
   resolve: {
     alias: {
       'react-native': 'react-native-web',
-      // Add aliases for React Native specific packages
-      'react-native-safe-area-context':
-        'react-native-safe-area-context/lib/commonjs/index.js',
-      '@react-navigation/native': '@react-navigation/native',
-      'react-native-screens': 'react-native-screens',
       '@react-native-async-storage/async-storage':
         'react-native-web/dist/exports/AsyncStorage',
     },
