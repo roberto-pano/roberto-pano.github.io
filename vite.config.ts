@@ -37,7 +37,6 @@ export default defineConfig({
       },
       external: [
         'react-native-safe-area-context',
-        '@react-navigation/native',
         'react-native-screens',
         '@react-native-async-storage/async-storage',
       ],
@@ -50,7 +49,6 @@ export default defineConfig({
     include: [
       'react-native-web',
       'react-native-safe-area-context',
-      '@react-navigation/native',
       'react-native-screens',
     ],
     esbuildOptions: {

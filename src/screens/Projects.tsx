@@ -1,19 +1,17 @@
 import React from 'react';
 import {View, Text, StyleSheet, Pressable, Platform} from 'react-native';
 import Screen from '../components/Screen';
-import {useNavigation} from '@react-navigation/native';
 
-export default function Projects() {
-  const navigation = useNavigation();
+import { useNavigate } from 'react-router-dom';
+
+  const navigate = useNavigate();
 
   return (
     <Screen title="Projects">
       <View style={styles.content}>
         <Pressable
           style={styles.projectCard}
-          onPress={() =>
-            navigation.navigate('MexicanVisualCultureProject' as never)
-          }>
+          onPress={() => navigate('/mexican-visual-culture')}>
           <Text style={styles.projectTitle}>
             Mexican Visual Culture Project
           </Text>

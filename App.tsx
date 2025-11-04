@@ -1,11 +1,8 @@
 import React from 'react';
-import Navigation from './src/navigation';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+
+import React from 'react';
+import Router from './src/router';
 
 export default function App() {
-  return (
-    <SafeAreaProvider>
-      <Navigation />
-    </SafeAreaProvider>
-  );
+  return <Router />;
 }
