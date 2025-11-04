@@ -1,5 +1,5 @@
 import React from 'react';
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 
 // Import screens/pages
 import Home from '../screens/Home';
@@ -22,6 +22,8 @@ const Router = () => {
           element={<MexicanVisualCultureProject />}
         />
         <Route path="/calendar" element={<Calendar />} />
+        {/* Fallback: redirect any unmatched route to Home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

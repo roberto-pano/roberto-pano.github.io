@@ -37,7 +37,6 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
       },
-      external: ['react-native-safe-area-context', 'react-native-screens'],
     },
     commonjsOptions: {
       transformMixedEsModules: true,
