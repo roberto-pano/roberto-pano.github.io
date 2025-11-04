@@ -8,13 +8,9 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
     "web": "vite",
-    "web:build": "vite build",
-    "web:serve": "vite preview",
-    "deploy": "gh-pages -d dist"
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "dependencies": {
     "react": "19.0.0",
