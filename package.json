@@ -8,9 +8,10 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "dev": "vite",
-    "build": "vite build",
-    "serve": "vite preview"
+  "dev": "vite",
+  "prebuild": "node scripts/copy-assets.js",
+  "build": "vite build",
+  "serve": "vite preview"
   },
   "dependencies": {
     "react": "19.0.0",

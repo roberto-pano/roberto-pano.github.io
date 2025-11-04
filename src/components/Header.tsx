@@ -17,7 +17,7 @@ const routes = [
   {name: 'Contact', path: '/contact'},
 ];
 
-export default function Header() {
+export default function Header({ title }: { title?: string }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -84,6 +84,15 @@ export default function Header() {
     [navigate],
   );
 
+  // If not web, render a simple top header that shows current page title
+  if (Platform.OS !== 'web') {
+    return (
+      <View style={styles.nativeHeader}>
+        <Text style={styles.nativeTitle}>{title || 'App'}</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {routes.map(item => (
@@ -102,21 +111,27 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: Platform.OS === 'web' ? 'row' : 'column',
+    flexDirection: Platform.OS === 'web' ? 'column' : 'column',
     backgroundColor: '#f8f9fa',
     padding: 16,
     ...Platform.select({
       web: {
-        width: '100%',
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: 220,
+        paddingTop: 24,
+        zIndex: 1000,
       },
       default: {
-        width: 200,
+        width: '100%',
       },
     }),
   },
   link: {
     padding: 12,
-    marginHorizontal: 4,
+    marginVertical: 6,
     borderRadius: 4,
   },
   activeLink: {
@@ -130,5 +145,17 @@ const styles = StyleSheet.create({
   activeText: {
     color: '#0056b3',
     fontWeight: 'bold',
+  },
+  nativeHeader: {
+    width: '100%',
+    padding: 12,
+    backgroundColor: '#f8f9fa',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ececec',
+  },
+  nativeTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#222',
   },
 });

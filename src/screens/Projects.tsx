@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, Pressable, Platform} from 'react-native';
+import {View, Text, StyleSheet, Pressable, Platform, Linking} from 'react-native';
 import Screen from '../components/Screen';
 
 import {useNavigate} from 'react-router-dom';
@@ -20,6 +20,18 @@ export default function Projects() {
             An exploration of Mexican visual culture through various mediums and
             time periods.
           </Text>
+        </Pressable>
+        <Pressable
+          style={[styles.projectCard, styles.githubCard]}
+          onPress={() => {
+            const url = 'https://github.com/roberto-pano';
+            if (Platform.OS === 'web' && typeof window !== 'undefined') {
+              window.open(url, '_blank');
+            } else {
+              Linking.openURL(url).catch(() => {});
+            }
+          }}>
+          <Text style={styles.projectTitle}>View on GitHub</Text>
         </Pressable>
       </View>
     </Screen>
@@ -62,5 +74,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666666',
     lineHeight: 24,
+  },
+  githubCard: {
+    backgroundColor: '#fff',
+    borderColor: '#ddd',
+    borderWidth: 1,
   },
 });
