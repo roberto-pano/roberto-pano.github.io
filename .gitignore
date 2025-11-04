@@ -2,8 +2,8 @@
 #
 .DS_Store
 
-# Xcode
-#
+# Build output
+dist/
 build/
 *.pbxuser
 !default.pbxuser

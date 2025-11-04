@@ -8,7 +8,31 @@ export default defineConfig({
   resolve: {
     alias: {
       'react-native': 'react-native-web',
+      // Add aliases for React Native specific packages
+      'react-native-safe-area-context':
+        'react-native-safe-area-context/lib/commonjs/index.js',
+      '@react-navigation/native': '@react-navigation/native',
+      'react-native-screens': 'react-native-screens',
+      '@react-native-async-storage/async-storage':
+        'react-native-web/dist/exports/AsyncStorage',
     },
+    extensions: [
+      '.web.tsx',
+      '.web.ts',
+      '.web.jsx',
+      '.web.js',
+      '.tsx',
+      '.ts',
+      '.jsx',
+      '.js',
+    ],
+  },
+  define: {
+    // Required for react-native-reanimated
+    __DEV__: JSON.stringify(process.env.NODE_ENV === 'development'),
+    // Required for react-native
+    Platform: JSON.stringify({OS: 'web'}),
+    // Add any other global variables your app needs
   },
   build: {
     outDir: 'dist',
@@ -16,13 +40,23 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
       },
+      external: [
+        'react-native-safe-area-context',
+        '@react-navigation/native',
+        'react-native-screens',
+        '@react-native-async-storage/async-storage',
+      ],
+    },
+    commonjsOptions: {
+      transformMixedEsModules: true,
     },
   },
   optimizeDeps: {
     include: [
       'react-native-web',
-      '@react-navigation/native',
       'react-native-safe-area-context',
+      '@react-navigation/native',
+      'react-native-screens',
     ],
     esbuildOptions: {
       mainFields: ['module', 'main'],
