@@ -2,8 +2,9 @@ import React from 'react';
 import {View, Text, StyleSheet, Pressable, Platform} from 'react-native';
 import Screen from '../components/Screen';
 
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
+export default function Projects() {
   const navigate = useNavigate();
 
   return (
