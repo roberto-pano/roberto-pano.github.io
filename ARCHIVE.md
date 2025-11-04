@@ -4,9 +4,9 @@ The original static site files are located under `cosmic-pony/old-site/` and wer
 
 If you want to archive the old-site so it is no longer served by Netlify, you have two safe options:
 
-1) Configure Netlify to use the `site/dist` publish directory (recommended). This repo includes `netlify.toml` configured to run `npm run build:web` and publish `site/dist`. Netlify will then serve the React app from `site/dist` and ignore `old-site` content.
+1. Configure Netlify to use the `site/dist` publish directory (recommended). This repo includes `netlify.toml` configured to run `npm run build:web` and publish `site/dist`. Netlify will then serve the React app from `site/dist` and ignore `old-site` content.
 
-2) Move the old-site into an `archive/` folder (destructive). To do this locally:
+2. Move the old-site into an `archive/` folder (destructive). To do this locally:
 
    - Move the folder: `git mv cosmic-pony/old-site cosmic-pony/old-site-archived`
    - Commit and push.
