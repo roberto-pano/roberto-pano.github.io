@@ -1,0 +1,44 @@
+:root {
+  --sidebar-width: 200px;
+  --bg: #f9f9f9;
+  --accent: #0b5cff;
+}
+body, html, #root { height: 100%; margin: 0; font-family: Arial, Helvetica, sans-serif; }
+.app { display: flex; min-height: 100%; background: var(--bg); }
+.sidebar { width: var(--sidebar-width); padding: 20px; background: #222; color: #fff; display: flex; flex-direction: column; gap: 8px; }
+.sidebar a, .sidebar .active { color: #ddd; text-decoration: none; padding: 6px 8px; border-radius: 4px; }
+.sidebar .active, .sidebar a:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.content { flex: 1; padding: 32px; }
+.profile_picture { max-width: 320px; display: block; margin: 0 auto; border-radius: 6px; }
+
+/* Modal styles used by MexicanVisualCultureProject */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.9);
+  align-items: center;
+  justify-content: center;
+}
+.modal.show { display: flex; }
+.modal-content {
+  max-width: 90%;
+  max-height: 80%;
+  object-fit: contain;
+}
+.modal .close {
+  position: absolute;
+  top: 18px;
+  right: 28px;
+  color: #fff;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+}
+#caption { color: #ccc; margin-top: 12px; text-align: center; }
+
