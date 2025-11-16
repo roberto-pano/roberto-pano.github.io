@@ -57,16 +57,12 @@ jobs:
           echo "Pushing ${IMAGE_NAME}"
           docker push ${IMAGE_NAME}
 
-      - name: Scan pushed image with Trivy (action)
-        # Use the maintained Trivy GitHub Action for robustness (avoids manual
-        # docker pull/tag drift and handles caching/outputs). It relies on the
-        # earlier ECR login step so the action can pull the image.
-        uses: aquasecurity/trivy-action@v1
-        with:
-          image-ref: ${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          format: table
-          # Exit with code 1 when vulnerabilities found (matches previous behaviour)
-          exit-code: 1
+      - name: Scan pushed image with Trivy (dockerized)
+        # The Trivy Action tag couldn't be resolved on the runner (v1 missing).
+        # Use the dockerized Trivy binary pinned to a working GHCR tag instead.
+        run: |
+          IMAGE=${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/aquasecurity/trivy:0.67.2 image --format table --exit-code 1 ${IMAGE}
 
       - name: Sign image with Cosign (keyless, dockerized)
         # Use the cosign container to sign the image keyless. This avoids using the Action hook
