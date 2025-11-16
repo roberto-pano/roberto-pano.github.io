@@ -1,4 +1,5 @@
-FROM node:20-bullseye
+# Use a more up-to-date, slim base (Debian bookworm) to reduce CVE exposure
+FROM node:20-bookworm-slim
 
 # Create app directory
 WORKDIR /app

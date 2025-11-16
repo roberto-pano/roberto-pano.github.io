@@ -57,12 +57,37 @@ jobs:
           echo "Pushing ${IMAGE_NAME}"
           docker push ${IMAGE_NAME}
 
-      - name: Scan pushed image with Trivy (dockerized)
-        # The Trivy Action tag couldn't be resolved on the runner (v1 missing).
-        # Use the dockerized Trivy binary pinned to a working GHCR tag instead.
+      - name: Scan pushed image with Trivy (json + table)
+        # Produce a JSON report for artifact upload and a human table for logs.
         run: |
           IMAGE=${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/aquasecurity/trivy:0.67.2 image --format table --exit-code 1 ${IMAGE}
+          # Mount the workspace so the container can write the JSON report to the host
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "${{ github.workspace }}:/work" -w /work ghcr.io/aquasecurity/trivy:0.67.2 image --format json --output /work/trivy-report.json ${IMAGE} || true
+          # Print a concise table of HIGH/CRITICAL vulnerabilities for quick view
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/aquasecurity/trivy:0.67.2 image --format table --severity CRITICAL,HIGH ${IMAGE} || true
+
+      - name: Upload Trivy JSON report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.json
+
+      - name: Fail on CRITICAL/HIGH vulnerabilities
+        if: always()
+        run: |
+          # Exit with non-zero if any HIGH or CRITICAL vulnerabilities are present
+          if [ -f trivy-report.json ]; then
+            if jq -e '.Results[].Vulnerabilities[] | select(.Severity=="CRITICAL" or .Severity=="HIGH")' trivy-report.json > /dev/null; then
+              echo "Found CRITICAL/HIGH vulnerabilities — failing job"
+              jq '.Results[].Vulnerabilities[] | select(.Severity=="CRITICAL" or .Severity=="HIGH") | {VulnerabilityID:.VulnerabilityID,Package:.PkgName,Installed:.InstalledVersion,Fixed:.FixedVersion,Severity:.Severity,Title:.Title}' trivy-report.json
+              exit 1
+            else
+              echo "No CRITICAL/HIGH vulnerabilities found"
+            fi
+          else
+            echo "No trivy report found; skipping vulnerability failure step"
+          fi
 
       - name: Sign image with Cosign (keyless, dockerized)
         # Use the cosign container to sign the image keyless. This avoids using the Action hook
