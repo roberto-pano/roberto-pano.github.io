@@ -16,18 +16,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run Gitleaks (CLI via Docker)
-        # Use the gitleaks CLI (Docker image) against the checked-out repository to avoid
-        # the Action's license enforcement and GitHub API rate-limit issues. This runs the
-        # scanner locally against the workspace and writes a JSON report at the repo root.
-        # We capture the exit code to .gitleaks_exit, upload the report, and then fail the
-        # job in a separate step if leaks were detected.
-        run: |
-          set +e
-          echo "Running gitleaks docker scan..."
-          docker run --rm -v "${{ github.workspace }}:/src" zricethezav/gitleaks:8.24.3 detect \
-            --source="/src" --report-format=json --report=/src/gitleaks-report.json --redact --verbose
-          echo "$?" > .gitleaks_exit
+      - name: Run Gitleaks (container runner)
+        # Use GitHub's container execution for the gitleaks image so the runner doesn't need
+        # the local `docker` binary (prevents exit code 125 when docker isn't available).
+        # The workspace is mounted at /github/workspace inside the container.
+        uses: docker://zricethezav/gitleaks:8.24.3
+        with:
+          args: detect --source=/github/workspace --report-format=json --report=/github/workspace/gitleaks-report.json --redact --verbose
         continue-on-error: true
 
       - name: Upload Gitleaks report
