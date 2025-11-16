@@ -89,63 +89,14 @@ jobs:
             echo "No trivy report found; skipping vulnerability failure step"
           fi
 
-      - name: Sign image with Cosign (keyless, verified)
-        # Safest-practical approach: download a pinned cosign release binary and verify its SHA256 checksum
-        # from the same GitHub release before executing. Fail if the checksum isn't available or doesn't match.
+      - name: Sign image with Cosign (keyless, digest-pinned)
+        # Use a digest-pinned cosign container image to avoid downloading binaries and to ensure immutability.
         run: |
           set -euo pipefail
           IMAGE=${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          COSIGN_VERSION=2.0.0
-          RELEASE_BASE="https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}"
-          echo "Downloading cosign v${COSIGN_VERSION} from ${RELEASE_BASE}"
-
-          # Try common binary/tarball names
-          if curl -fSL -o cosign "${RELEASE_BASE}/cosign-linux-amd64"; then
-            echo "Downloaded cosign-linux-amd64"
-          elif curl -fSL -o cosign.tar.gz "${RELEASE_BASE}/cosign_${COSIGN_VERSION}_linux_amd64.tar.gz"; then
-            echo "Downloaded cosign tarball"
-            tar xzf cosign.tar.gz
-          else
-            echo "Failed to download cosign v${COSIGN_VERSION} binary or tarball from GitHub releases"
-            exit 1
-          fi
-
-          if [ ! -f cosign ]; then
-            echo "No cosign binary present after extraction"
-            ls -la || true
-            exit 1
-          fi
-
-          # Compute local checksum
-          LOCAL_SUM=$(sha256sum cosign | awk '{print $1}')
-          echo "Local sha256: ${LOCAL_SUM}"
-
-          # Try a few common checksum filenames from GitHub releases
-          CHECKSUM_OK=0
-          for NAME in "cosign_${COSIGN_VERSION}_checksums.txt" "checksums.txt" "sha256sum.txt" "sha256sums.txt" "SHA256SUMS" "sha256sums"; do
-            URL="${RELEASE_BASE}/${NAME}"
-            echo "Attempting to fetch checksum file: ${URL}"
-            if curl -fsSL -o cosign.SHA256 "${URL}"; then
-              if grep -q "${LOCAL_SUM}" cosign.SHA256; then
-                echo "Checksum verification passed against ${NAME}"
-                CHECKSUM_OK=1
-                break
-              else
-                echo "Checksum file ${NAME} found but did not match local binary"
-                cat cosign.SHA256 || true
-                exit 1
-              fi
-            fi
-          done
-
-          if [ "${CHECKSUM_OK}" -ne 1 ]; then
-            echo "No checksum file matched local cosign binary; refusing to run unverified binary"
-            exit 1
-          fi
-
-          chmod +x cosign
-          echo "Signing ${IMAGE} with cosign (keyless)"
-          ./cosign sign --keyless ${IMAGE}
+          COSIGN_DIGEST=ghcr.io/sigstore/cosign/cosign@sha256:b29487e48205d875c324c79583e2806d9d269c0fa299e0861bbec023d8430c8b
+          echo "Signing ${IMAGE} using ${COSIGN_DIGEST}"
+          docker run --rm ${COSIGN_DIGEST} sign --keyless ${IMAGE}
 
       - name: Pull and run CI inside the signed image
         run: |
