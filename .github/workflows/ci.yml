@@ -31,6 +31,10 @@ jobs:
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          # We don't need the docker credential outputs across jobs in this
+          # workflow, so keep the Docker password masked in logs for safety.
+          mask-password: true
 
       - name: Get AWS account ID
         id: get-account
