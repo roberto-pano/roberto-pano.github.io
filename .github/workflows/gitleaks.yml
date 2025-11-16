@@ -33,30 +33,15 @@ jobs:
 
           echo "Fetching latest gitleaks release metadata..."
           rel_json=$(curl -sS https://api.github.com/repos/gitleaks/gitleaks/releases/latest)
-
-          # Prefer any asset whose name mentions linux and a common x86_64/x64 identifier.
-          asset_url=$(echo "$rel_json" | jq -r '.assets[] | select((.name|ascii_downcase|test("linux")) and (.name|ascii_downcase|test("x64|x86_64|amd64|_x64|x86"))) | .browser_download_url' | head -n1)
-
-          # If that didn't find anything, accept any linux asset (common fallback) with an octet-stream content type
+          asset_url=$(echo "$rel_json" | jq -r '.assets[] | select(.name|test("(linux|Linux).*(amd64|x86_64)|linux-amd64")) | .browser_download_url' | head -n1)
           if [ -z "$asset_url" ] || [ "$asset_url" = "null" ]; then
-            asset_url=$(echo "$rel_json" | jq -r '.assets[] | select((.name|ascii_downcase|test("linux")) and (.content_type=="application/octet-stream")) | .browser_download_url' | head -n1)
+            echo "Could not find a Linux amd64 asset in the latest gitleaks release. Falling back to trying 'gitleaks-linux-amd64' asset name..."
+            asset_url=$(echo "$rel_json" | jq -r '.assets[] | select(.name|test("gitleaks.*linux.*amd64|gitleaks.*linux.*x86_64")) | .browser_download_url' | head -n1)
           fi
-
-          # Final fallback: construct the likely linux x64 asset name from the tag (e.g. gitleaks_8.29.0_linux_x64.tar.gz)
           if [ -z "$asset_url" ] || [ "$asset_url" = "null" ]; then
-            tag_name=$(echo "$rel_json" | jq -r '.tag_name')
-            tag_no_v=${tag_name#v}
-            constructed_url="https://github.com/gitleaks/gitleaks/releases/download/${tag_name}/gitleaks_${tag_no_v}_linux_x64.tar.gz"
-            echo "Attempting constructed asset URL: $constructed_url"
-
-            # Quick check if constructed URL exists (HTTP 200)
-            if curl -sfI "$constructed_url" >/dev/null 2>&1; then
-              asset_url="$constructed_url"
-            else
-              echo "No suitable gitleaks release asset found after trying flexible patterns and constructed fallback."
-              rc=3
-              exit 1
-            fi
+            echo "No suitable gitleaks release asset found. Exiting with failure."
+            rc=3
+            exit 1
           fi
 
           echo "Downloading gitleaks asset: $asset_url"
@@ -87,10 +72,10 @@ jobs:
           echo "Running gitleaks detect against workspace..."
           set +e
           if command -v gitleaks >/dev/null 2>&1; then
-            gitleaks detect --source="$GITHUB_WORKSPACE" --report-format=json --report="$GITHUB_WORKSPACE/gitleaks-report.json" --redact --verbose
+            gitleaks detect --source="$GITHUB_WORKSPACE" --report-format=json --report-path="$GITHUB_WORKSPACE/gitleaks-report.json" --redact --verbose
             rc=$?
           else
-            "$GITHUB_WORKSPACE/gitleaks" detect --source="$GITHUB_WORKSPACE" --report-format=json --report="$GITHUB_WORKSPACE/gitleaks-report.json" --redact --verbose
+            "$GITHUB_WORKSPACE/gitleaks" detect --source="$GITHUB_WORKSPACE" --report-format=json --report-path="$GITHUB_WORKSPACE/gitleaks-report.json" --redact --verbose
             rc=$?
           fi
         continue-on-error: true
