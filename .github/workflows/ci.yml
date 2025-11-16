@@ -109,8 +109,20 @@ jobs:
           # Get an ECR auth token and pass it to cosign so it can access the registry.
           # We avoid printing the token; it will be passed as an argument to the cosign container.
           ECR_PASSWORD=$(aws ecr get-login-password --region ${{ env.AWS_REGION }})
+          # Request a GitHub Actions OIDC ID token for sigstore so cosign can perform non-interactive keyless signing.
+          # ACTIONS_ID_TOKEN_REQUEST_URL and ACTIONS_ID_TOKEN_REQUEST_TOKEN are provided by the Actions runner
+          # when the workflow has 'id-token: write' permission.
+          if [ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ] || [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-}" ]; then
+            echo "OIDC token endpoint variables not available; cannot obtain ID token for cosign" >&2
+            exit 1
+          fi
+          ID_TOKEN=$(curl -s -H "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sigstore")
+          if [ -z "${ID_TOKEN}" ]; then
+            echo "Failed to obtain ID token for cosign; aborting" >&2
+            exit 1
+          fi
           # Use registry username 'AWS' with the ECR password per Amazon ECR auth flow
-          docker run --rm ${COSIGN_DIGEST} sign --registry-username AWS --registry-password "${ECR_PASSWORD}" ${DIGEST}
+          docker run --rm ${COSIGN_DIGEST} sign --identity-token "${ID_TOKEN}" --registry-username AWS --registry-password "${ECR_PASSWORD}" ${DIGEST}
 
       - name: Pull and run CI inside the signed image
         run: |
