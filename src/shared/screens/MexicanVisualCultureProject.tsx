@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 // CSS module used for the web modal. The module lives under `site/src/pages`.
 // We import it directly so the web variant can use the styles.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
 // @ts-ignore - CSS module path outside src; type declared in src/types/global.d.ts
 import modalStyles from '../../../site/src/pages/Modal.module.css';
 import { View, Text, Modal, Image, StyleSheet, Platform, TouchableOpacity } from 'react-native';
