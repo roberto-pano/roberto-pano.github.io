@@ -33,15 +33,43 @@ jobs:
 
           echo "Fetching latest gitleaks release metadata..."
           rel_json=$(curl -sS https://api.github.com/repos/gitleaks/gitleaks/releases/latest)
-          asset_url=$(echo "$rel_json" | jq -r '.assets[] | select(.name|test("(linux|Linux).*(amd64|x86_64)|linux-amd64")) | .browser_download_url' | head -n1)
+
+          # Try several strategies to find a Linux x64 asset. Some releases use
+          # "linux_x64" or "x64" in the filename; others use content types like
+          # application/octet-stream or application/gzip. We'll try name-based
+          # matching first, then accept linux assets with common archive content
+          # types, and finally fall back to constructing the conventional URL.
+          asset_url=$(echo "$rel_json" | jq -r '
+            .assets[]
+            | .name as $n
+            | ($n|ascii_downcase) as $ln
+            | select( ($ln|test("linux.*(x64|x86_64|amd64|_x64|x86)")) )
+            | .browser_download_url' | head -n1)
+
           if [ -z "$asset_url" ] || [ "$asset_url" = "null" ]; then
-            echo "Could not find a Linux amd64 asset in the latest gitleaks release. Falling back to trying 'gitleaks-linux-amd64' asset name..."
-            asset_url=$(echo "$rel_json" | jq -r '.assets[] | select(.name|test("gitleaks.*linux.*amd64|gitleaks.*linux.*x86_64")) | .browser_download_url' | head -n1)
+            # Accept linux assets that either have an x64 marker in the name or
+            # use a common archive content type (octet/zip/gzip/tar).
+            asset_url=$(echo "$rel_json" | jq -r '
+              .assets[]
+              | .name as $n
+              | ($n|ascii_downcase) as $ln
+              | select( ($ln|test("linux") and ($ln|test("x64|x86_64|amd64|_x64|x86") or (.content_type|ascii_downcase|test("octet|gzip|zip|tar")) ) ) )
+              | .browser_download_url' | head -n1)
           fi
+
+          # Final fallback: try constructing the conventional asset name from the tag
           if [ -z "$asset_url" ] || [ "$asset_url" = "null" ]; then
-            echo "No suitable gitleaks release asset found. Exiting with failure."
-            rc=3
-            exit 1
+            tag_name=$(echo "$rel_json" | jq -r '.tag_name')
+            tag_no_v=${tag_name#v}
+            constructed_url="https://github.com/gitleaks/gitleaks/releases/download/${tag_name}/gitleaks_${tag_no_v}_linux_x64.tar.gz"
+            echo "Attempting constructed asset URL: $constructed_url"
+            if curl -sfI "$constructed_url" >/dev/null 2>&1; then
+              asset_url="$constructed_url"
+            else
+              echo "No suitable gitleaks release asset found after trying flexible patterns and constructed fallback."
+              rc=3
+              exit 1
+            fi
           fi
 
           echo "Downloading gitleaks asset: $asset_url"
