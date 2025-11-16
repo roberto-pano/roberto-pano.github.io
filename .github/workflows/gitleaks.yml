@@ -16,13 +16,64 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run Gitleaks (container runner)
-        # Use GitHub's container execution for the gitleaks image so the runner doesn't need
-        # the local `docker` binary (prevents exit code 125 when docker isn't available).
-        # The workspace is mounted at /github/workspace inside the container.
-        uses: docker://zricethezav/gitleaks:8.24.3
-        with:
-          args: detect --source=/github/workspace --report-format=json --report=/github/workspace/gitleaks-report.json --redact --verbose
+      - name: Run Gitleaks (download binary)
+        # Download the latest gitleaks release binary for Linux amd64 via the GitHub API,
+        # extract it, and run the `detect` command against the checked-out repository.
+        # This avoids relying on a specific container tag that may not exist on Docker Hub.
+        run: |
+          set -euxo pipefail
+          # ensure jq is available
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y jq
+          fi
+
+          echo "Fetching latest gitleaks release metadata..."
+          rel_json=$(curl -sS https://api.github.com/repos/gitleaks/gitleaks/releases/latest)
+          asset_url=$(echo "$rel_json" | jq -r '.assets[] | select(.name|test("(linux|Linux).*(amd64|x86_64)|linux-amd64")) | .browser_download_url' | head -n1)
+          if [ -z "$asset_url" ] || [ "$asset_url" = "null" ]; then
+            echo "Could not find a Linux amd64 asset in the latest gitleaks release. Falling back to trying 'gitleaks-linux-amd64' asset name..."
+            asset_url=$(echo "$rel_json" | jq -r '.assets[] | select(.name|test("gitleaks.*linux.*amd64|gitleaks.*linux.*x86_64")) | .browser_download_url' | head -n1)
+          fi
+          if [ -z "$asset_url" ] || [ "$asset_url" = "null" ]; then
+            echo "No suitable gitleaks release asset found. Exiting with failure."
+            exit 1
+          fi
+
+          echo "Downloading gitleaks asset: $asset_url"
+          curl -L --retry 3 --retry-delay 2 "$asset_url" -o /tmp/gitleaks_asset
+
+          mkdir -p /tmp/gitleaks && cd /tmp/gitleaks
+          # try tar extraction, otherwise unzip
+          if file /tmp/gitleaks_asset | grep -qi 'gzip\|x86-64\|tar'; then
+            tar xzf /tmp/gitleaks_asset || true
+          else
+            unzip -q /tmp/gitleaks_asset || true
+          fi
+
+          # find the binary and make it executable
+          bin=$(find . -type f -iname 'gitleaks*' -perm /111 | head -n1 || true)
+          if [ -z "$bin" ]; then
+            bin=$(find . -type f -iname 'gitleaks*' | head -n1 || true)
+          fi
+          if [ -z "$bin" ]; then
+            echo "gitleaks binary not found after extraction" >&2
+            ls -la
+            exit 1
+          fi
+          chmod +x "$bin"
+          mv "$bin" /usr/local/bin/gitleaks || mv "$bin" "$GITHUB_WORKSPACE/gitleaks"
+
+          echo "Running gitleaks detect against workspace..."
+          set +e
+          if command -v gitleaks >/dev/null 2>&1; then
+            gitleaks detect --source="$GITHUB_WORKSPACE" --report-format=json --report="$GITHUB_WORKSPACE/gitleaks-report.json" --redact --verbose
+            rc=$?
+          else
+            "$GITHUB_WORKSPACE/gitleaks" detect --source="$GITHUB_WORKSPACE" --report-format=json --report="$GITHUB_WORKSPACE/gitleaks-report.json" --redact --verbose
+            rc=$?
+          fi
+          echo "$rc" > "$GITHUB_WORKSPACE/.gitleaks_exit"
         continue-on-error: true
 
       - name: Upload Gitleaks report
