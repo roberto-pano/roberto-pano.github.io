@@ -53,20 +53,20 @@ jobs:
           echo "Pushing ${IMAGE_NAME}"
           docker push ${IMAGE_NAME}
 
-      - name: Scan pushed image with Trivy
-        # Pin to the maintained major release tag to avoid missing patch tags
-        uses: aquasecurity/trivy-action@v1
-        with:
-          image-ref: ${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          format: 'table'
-          exit-code: '1' # non-zero exit if vulnerabilities found (customize severity behavior in Trivy config)
+      - name: Scan pushed image with Trivy (dockerized)
+        # Use the official Trivy docker image to avoid action pin resolution issues.
+        # This requires Docker to be available on the runner (ubuntu-latest provides it).
+        run: |
+          IMAGE=${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.43.2 image --format table --exit-code 1 ${IMAGE}
 
-      - name: Sign image with Cosign (keyless)
-        # Use the stable action major tag. If this still errors, try @main or @latest
-        uses: sigstore/cosign-action@v1
-        with:
-          keyless: true
-          image: ${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+      - name: Sign image with Cosign (keyless, dockerized)
+        # Use the cosign container to sign the image keyless. This avoids using the Action hook
+        # and any missing repo/tag errors.
+        run: |
+          IMAGE=${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          # cosign image is published under gcr.io/projectsigstore/cosign/cosign
+          docker run --rm gcr.io/projectsigstore/cosign/cosign:2.0.0 sign --keyless ${IMAGE}
 
       - name: Pull and run CI inside the signed image
         run: |

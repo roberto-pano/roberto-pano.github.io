@@ -78,3 +78,6 @@ gems/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# vendored ruby gems
+2.6.0/
