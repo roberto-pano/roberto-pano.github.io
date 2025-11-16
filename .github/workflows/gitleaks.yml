@@ -16,10 +16,41 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run Gitleaks
-        # The action requires a GitHub token to scan pull requests. Pass the automatically
-        # created token via `secrets.GITHUB_TOKEN`. Keep flags as args if the action accepts them.
-        uses: zricethezav/gitleaks-action@v2
+      - name: Run Gitleaks (CLI via Docker)
+        # Use the gitleaks CLI (Docker image) against the checked-out repository to avoid
+        # the Action's license enforcement and GitHub API rate-limit issues. This runs the
+        # scanner locally against the workspace and writes a JSON report at the repo root.
+        # We capture the exit code to .gitleaks_exit, upload the report, and then fail the
+        # job in a separate step if leaks were detected.
+        run: |
+          set +e
+          echo "Running gitleaks docker scan..."
+          docker run --rm -v "${{ github.workspace }}:/src" zricethezav/gitleaks:8.24.3 detect \
+            --source="/src" --report-format=json --report=/src/gitleaks-report.json --redact --verbose
+          echo "$?" > .gitleaks_exit
+        continue-on-error: true
+
+      - name: Upload Gitleaks report
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          args: --verbose --redact
+          name: gitleaks-report
+          path: |
+            gitleaks-report.json
+            .gitleaks_exit
+
+      - name: Fail if Gitleaks found secrets
+        if: always()
+        run: |
+          if [ -f .gitleaks_exit ]; then
+            code=$(cat .gitleaks_exit)
+            if [ "$code" != "0" ]; then
+              echo "Gitleaks detected secrets (exit code=$code). See artifact 'gitleaks-report' for details."
+              exit 1
+            else
+              echo "No leaks detected by gitleaks."
+            fi
+          else
+            echo "No gitleaks exit code found; failing to be safe."
+            exit 1
+          fi
