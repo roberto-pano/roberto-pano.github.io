@@ -17,8 +17,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Gitleaks
-        # Use the major tag to avoid occasional missing patch tags; change to a specific
-        # minor/patch tag if you need an exact version (check the action repo for tags).
+        # The action requires a GitHub token to scan pull requests. Pass the automatically
+        # created token via `secrets.GITHUB_TOKEN`. Keep flags as args if the action accepts them.
         uses: zricethezav/gitleaks-action@v2
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           args: --verbose --redact
