@@ -91,7 +91,7 @@ jobs:
 
       - name: Sign image with Cosign (keyless, digest-pinned)
         # Use a digest-pinned cosign container image. Pull the pushed image, sign its digest (not the tag),
-        # and mount the Docker credentials so cosign can authenticate to ECR.
+        # and authenticate cosign to ECR using a short-lived token and GitHub OIDC for keyless signing.
         run: |
           set -euo pipefail
           IMAGE=${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
@@ -106,26 +106,23 @@ jobs:
             exit 1
           fi
           echo "Signing ${DIGEST} using ${COSIGN_DIGEST}"
-          # Get an ECR auth token and pass it to cosign so it can access the registry.
-          # We avoid printing the token; it will be passed as an argument to the cosign container.
+          # Get an ECR auth token (short-lived)
           ECR_PASSWORD=$(aws ecr get-login-password --region ${{ env.AWS_REGION }})
-          # Request a GitHub Actions OIDC ID token for sigstore so cosign can perform non-interactive keyless signing.
-          # ACTIONS_ID_TOKEN_REQUEST_URL and ACTIONS_ID_TOKEN_REQUEST_TOKEN are provided by the Actions runner
-          # when the workflow has 'id-token: write' permission.
+          # Ensure OIDC endpoint variables are available (runner provides these when id-token: write)
           if [ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ] || [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-}" ]; then
             echo "OIDC token endpoint variables not available; cannot obtain ID token for cosign" >&2
             exit 1
           fi
-          # The token endpoint returns JSON like {"value":"<token>"} — extract the raw token value.
+          # Fetch ID token for sigstore (JSON: {"value":"<token>"})
           RAW_ID_RESPONSE=$(curl -s -H "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sigstore")
-          # Try to extract with jq; fall back to python if jq missing
-        ID_TOKEN=$(printf '%s' "${RAW_ID_RESPONSE}" | jq -r '.value' 2>/dev/null || python -c 'import sys,json; data=json.load(sys.stdin); sys.stdout.write(data.get("value",""))')
-        if [ -z "${ID_TOKEN}" ]; then:
-        echo "Failed to obtain raw ID token for cosign; response was: ${RAW_ID_RESPONSE}" >&2
+          # Extract raw token using jq or a small python fallback
+          ID_TOKEN=$(printf '%s' "${RAW_ID_RESPONSE}" | jq -r '.value' 2>/dev/null || python -c 'import sys,json; data=json.load(sys.stdin); sys.stdout.write(data.get("value",""))')
+          if [ -z "${ID_TOKEN}" ]; then
+            echo "Failed to obtain raw ID token for cosign; response was: ${RAW_ID_RESPONSE}" >&2
             exit 1
           fi
-          # Use registry username 'AWS' with the ECR password per Amazon ECR auth flow
-        docker run --rm ${COSIGN_DIGEST} sign --identity-token "${ID_TOKEN}" --registry-username AWS --registry-password "${ECR_PASSWORD}" ${DIGEST}
+          # Run cosign and authenticate to registry with ECR token
+          docker run --rm ${COSIGN_DIGEST} sign --identity-token "${ID_TOKEN}" --registry-username AWS --registry-password "${ECR_PASSWORD}" ${DIGEST}
 
       - name: Pull and run CI inside the signed image
         run: |
