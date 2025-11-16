@@ -90,13 +90,24 @@ jobs:
           fi
 
       - name: Sign image with Cosign (keyless, digest-pinned)
-        # Use a digest-pinned cosign container image to avoid downloading binaries and to ensure immutability.
+        # Use a digest-pinned cosign container image. Pull the pushed image, sign its digest (not the tag),
+        # and mount the Docker credentials so cosign can authenticate to ECR.
         run: |
           set -euo pipefail
           IMAGE=${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
           COSIGN_DIGEST=ghcr.io/sigstore/cosign/cosign@sha256:b29487e48205d875c324c79583e2806d9d269c0fa299e0861bbec023d8430c8b
-          echo "Signing ${IMAGE} using ${COSIGN_DIGEST}"
-          docker run --rm ${COSIGN_DIGEST} sign --keyless ${IMAGE}
+          echo "Pulling ${IMAGE} to ensure the registry digest is available"
+          docker pull ${IMAGE}
+          # Get the canonical digest reference (repo@sha256:...)
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE} || true)
+          if [ -z "${DIGEST}" ] || [ "${DIGEST}" = "<no value>" ]; then
+            echo "Failed to obtain image digest for ${IMAGE}" >&2
+            docker images --digests ${IMAGE} || true
+            exit 1
+          fi
+          echo "Signing ${DIGEST} using ${COSIGN_DIGEST}"
+          # Mount the docker credentials so cosign can push signatures/attestations to the registry
+          docker run --rm -v "${HOME}/.docker:/root/.docker:ro" ${COSIGN_DIGEST} sign ${DIGEST}
 
       - name: Pull and run CI inside the signed image
         run: |
