@@ -106,8 +106,11 @@ jobs:
             exit 1
           fi
           echo "Signing ${DIGEST} using ${COSIGN_DIGEST}"
-          # Mount the docker credentials so cosign can push signatures/attestations to the registry
-          docker run --rm -v "${HOME}/.docker:/root/.docker:ro" ${COSIGN_DIGEST} sign ${DIGEST}
+          # Get an ECR auth token and pass it to cosign so it can access the registry.
+          # We avoid printing the token; it will be passed as an argument to the cosign container.
+          ECR_PASSWORD=$(aws ecr get-login-password --region ${{ env.AWS_REGION }})
+          # Use registry username 'AWS' with the ECR password per Amazon ECR auth flow
+          docker run --rm ${COSIGN_DIGEST} sign --registry-username AWS --registry-password "${ECR_PASSWORD}" ${DIGEST}
 
       - name: Pull and run CI inside the signed image
         run: |
