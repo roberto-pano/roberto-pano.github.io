@@ -1,34 +1,22 @@
-import {useCallback, useEffect} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Platform,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import { useCallback, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Platform, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigate, useLocation} from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const routes = [
-  {name: 'Home', path: '/'},
-  {name: 'About', path: '/about'},
-  {name: 'Projects', path: '/projects'},
-  {name: 'Contact', path: '/contact'},
+  { name: 'Home', path: '/' },
+  { name: 'About', path: '/about' },
+  { name: 'Projects', path: '/projects' },
+  { name: 'Contact', path: '/contact' },
 ];
 
-export default function Header({title}: {title?: string}) {
+export default function Header({ title }: { title?: string }) {
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleResponse = useCallback((response: string) => {
     const s = response.toLowerCase();
-    const message =
-      s === 'yes'
-        ? 'Great! Glad to hear :)'
-        : s === 'no'
-        ? 'I am sorry to hear that, I hope it gets better!'
-        : 'No worries!';
+    const message = s === 'yes' ? 'Great! Glad to hear :)' : s === 'no' ? 'I am sorry to hear that, I hope it gets better!' : 'No worries!';
 
     Alert.alert('Response', message);
   }, []);
@@ -50,7 +38,7 @@ export default function Header({title}: {title?: string}) {
         ]);
         await AsyncStorage.setItem('promptResponse', 'true');
       }
-    } catch (e) {
+    } catch {
       // ignore if storage not available
     }
   }, [handleResponse]);
@@ -95,14 +83,9 @@ export default function Header({title}: {title?: string}) {
 
   return (
     <View style={styles.container}>
-      {routes.map(item => (
-        <TouchableOpacity
-          key={item.path}
-          style={[styles.link, isActive(item.path) && styles.activeLink]}
-          onPress={() => handlePress(item.path)}>
-          <Text style={[styles.text, isActive(item.path) && styles.activeText]}>
-            {item.name}
-          </Text>
+      {routes.map((item) => (
+        <TouchableOpacity key={item.path} style={[styles.link, isActive(item.path) && styles.activeLink]} onPress={() => handlePress(item.path)}>
+          <Text style={[styles.text, isActive(item.path) && styles.activeText]}>{item.name}</Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -134,8 +117,12 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     borderRadius: 4,
   },
+  // Use a left accent for active state instead of changing the whole link background
   activeLink: {
-    backgroundColor: '#e9ecef',
+    backgroundColor: 'transparent',
+    borderLeftWidth: 4,
+    borderLeftColor: '#007bff',
+    paddingLeft: 8,
   },
   text: {
     fontSize: 16,
@@ -144,7 +131,7 @@ const styles = StyleSheet.create({
   },
   activeText: {
     color: '#0056b3',
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   nativeHeader: {
     width: '100%',

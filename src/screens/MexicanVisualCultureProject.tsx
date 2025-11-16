@@ -1,14 +1,5 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  Modal,
-  Platform,
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Modal, Platform } from 'react-native';
 import Screen from '../components/Screen';
 
 const IMAGES = [
@@ -103,7 +94,7 @@ export default function MexicanVisualCultureProject() {
   const [modalSrc, setModalSrc] = useState('');
   const [modalCaption, setModalCaption] = useState('');
 
-  function openModal(img: {src: string; alt?: string; description?: string}) {
+  function openModal(img: { src: string; alt?: string; description?: string }) {
     setModalSrc(img.src);
     setModalCaption(img.description || img.alt || '');
     setModalOpen(true);
@@ -119,41 +110,25 @@ export default function MexicanVisualCultureProject() {
     <Screen title="Mexican Visual Culture Project">
       <View style={styles.container}>
         <Text style={styles.description}>
-          The Mexican Visual Culture Project explores Mexican-American and
-          Chicano/a/x artistic responses to identity, community, and history.
+          The Mexican Visual Culture Project explores Mexican-American and Chicano/a/x artistic responses to identity, community, and history.
         </Text>
 
         <ScrollView contentContainerStyle={styles.grid}>
           {IMAGES.map((img, i) => (
             <View key={i} style={styles.card}>
               <TouchableOpacity onPress={() => openModal(img)}>
-                <Image
-                  source={{uri: img.src}}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
+                <Image source={{ uri: img.src }} style={styles.image} resizeMode="cover" />
               </TouchableOpacity>
               <Text style={styles.title}>{img.title}</Text>
-              {img.description ? (
-                <Text style={styles.caption}>{img.description}</Text>
-              ) : null}
+              {img.description ? <Text style={styles.caption}>{img.description}</Text> : null}
             </View>
           ))}
         </ScrollView>
 
         <Modal visible={modalOpen} transparent animationType="fade">
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            onPress={closeModal}
-            activeOpacity={1}>
-            <Image
-              source={{uri: modalSrc}}
-              style={styles.modalImage}
-              resizeMode="contain"
-            />
-            {modalCaption ? (
-              <Text style={styles.modalCaption}>{modalCaption}</Text>
-            ) : null}
+          <TouchableOpacity style={styles.modalOverlay} onPress={closeModal} activeOpacity={1}>
+            <Image source={{ uri: modalSrc }} style={styles.modalImage} resizeMode="contain" />
+            {modalCaption ? <Text style={styles.modalCaption}>{modalCaption}</Text> : null}
           </TouchableOpacity>
         </Modal>
       </View>
@@ -187,8 +162,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#fff',
     ...Platform.select({
-      web: {boxShadow: '0 2px 6px rgba(0,0,0,0.08)'},
-      default: {elevation: 2},
+      web: { boxShadow: '0 2px 6px rgba(0,0,0,0.08)' },
+      default: { elevation: 2 },
     }),
   },
   image: {

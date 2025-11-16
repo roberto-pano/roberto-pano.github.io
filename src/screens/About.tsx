@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import Screen from '../components/Screen';
 
 export default function About() {
@@ -7,8 +7,7 @@ export default function About() {
     <Screen title="About Me">
       <View style={styles.content}>
         <Text style={styles.text}>
-          I am a software developer with a passion for creating innovative
-          solutions and learning new technologies. My experience includes web
+          I am a software developer with a passion for creating innovative solutions and learning new technologies. My experience includes web
           development, mobile applications, and cross-platform solutions.
         </Text>
       </View>

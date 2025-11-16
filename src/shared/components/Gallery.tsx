@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Platform,
-  StyleSheet,
-  FlatList,
-  Dimensions,
-} from 'react-native';
+import { View, Text, Image, TouchableOpacity, Platform, StyleSheet, FlatList, Dimensions } from 'react-native';
 
 const numColumns = Platform.select({
   web: 3,
@@ -35,13 +26,11 @@ interface GalleryProps {
   onImagePress?: (image: GalleryImage) => void;
 }
 
-export const Gallery = ({images, onImagePress}: GalleryProps) => {
-  const renderItem = ({item}: {item: GalleryImage}) => (
-    <TouchableOpacity
-      style={styles.galleryItem}
-      onPress={() => onImagePress?.(item)}>
+export const Gallery = ({ images, onImagePress }: GalleryProps) => {
+  const renderItem = ({ item }: { item: GalleryImage }) => (
+    <TouchableOpacity style={styles.galleryItem} onPress={() => onImagePress?.(item)}>
       <Image
-        source={Platform.OS === 'web' ? {uri: item.src} : require(item.src)}
+        source={Platform.OS === 'web' ? { uri: item.src } : require(item.src)}
         style={styles.image}
         accessibilityLabel={item.alt}
         resizeMode="cover"
@@ -89,7 +78,7 @@ const styles = StyleSheet.create({
       },
     }),
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,

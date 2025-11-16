@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import styles from './MexicanVisualCultureProject.module.css';
 import modalStyles from './Modal.module.css';
 
@@ -106,10 +106,10 @@ export default function MexicanVisualCultureProject() {
 
   return (
     <div className={styles.galleryContainer}>
-      <h2 style={{textAlign: 'center', marginBottom: '24px'}}>
+      <h2 style={{ textAlign: 'center', marginBottom: '24px' }}>
         Virtual Art Exhibit
       </h2>
-      <p style={{textAlign: 'center', marginBottom: '24px'}}>
+      <p style={{ textAlign: 'center', marginBottom: '24px' }}>
         The theme of the overall exhibit is an exploration into dual identity
         and how Mexican-American and Chicano/a/x artists express identity
         through various mediums and art styles.
@@ -123,7 +123,7 @@ export default function MexicanVisualCultureProject() {
               alt={img.alt}
               className={styles.galleryImage}
               onClick={() => openModal(img)}
-              style={{cursor: 'pointer'}}
+              style={{ cursor: 'pointer' }}
             />
             <div className={styles.galleryContent}>
               <h3 className={styles.galleryTitle}>{img.title || img.alt}</h3>

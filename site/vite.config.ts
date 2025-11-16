@@ -1,6 +1,6 @@
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import {resolve} from 'path';
+import { resolve } from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -19,7 +19,7 @@ export default defineConfig({
       output: {
         entryFileNames: 'assets/[name].[hash].js',
         chunkFileNames: 'assets/[name].[hash].js',
-        assetFileNames: ({name}) => {
+        assetFileNames: ({ name }) => {
           if (/\.(css)$/.test(name ?? '')) {
             return 'assets/css/[name].[hash][extname]';
           }
@@ -28,7 +28,7 @@ export default defineConfig({
           }
           return 'assets/[name].[hash][extname]';
         },
-        manualChunks: id => {
+        manualChunks: (id) => {
           if (id.includes('node_modules')) {
             if (id.includes('react')) {
               return 'vendor-react';
