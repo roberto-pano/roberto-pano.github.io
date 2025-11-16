@@ -22,6 +22,9 @@ jobs:
         # This avoids relying on a specific container tag that may not exist on Docker Hub.
         run: |
           set -euxo pipefail
+          # Ensure we always write an exit code file for downstream steps. rc defaults to 2 (unexpected failure).
+          rc=2
+          trap 'echo "$rc" > "$GITHUB_WORKSPACE/.gitleaks_exit" || true' EXIT
           # ensure jq is available
           if ! command -v jq >/dev/null 2>&1; then
             sudo apt-get update
@@ -37,6 +40,7 @@ jobs:
           fi
           if [ -z "$asset_url" ] || [ "$asset_url" = "null" ]; then
             echo "No suitable gitleaks release asset found. Exiting with failure."
+            rc=3
             exit 1
           fi
 
@@ -59,6 +63,7 @@ jobs:
           if [ -z "$bin" ]; then
             echo "gitleaks binary not found after extraction" >&2
             ls -la
+            rc=4
             exit 1
           fi
           chmod +x "$bin"
@@ -73,7 +78,6 @@ jobs:
             "$GITHUB_WORKSPACE/gitleaks" detect --source="$GITHUB_WORKSPACE" --report-format=json --report="$GITHUB_WORKSPACE/gitleaks-report.json" --redact --verbose
             rc=$?
           fi
-          echo "$rc" > "$GITHUB_WORKSPACE/.gitleaks_exit"
         continue-on-error: true
 
       - name: Upload Gitleaks report
