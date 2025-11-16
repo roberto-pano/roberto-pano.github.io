@@ -54,14 +54,16 @@ jobs:
           docker push ${IMAGE_NAME}
 
       - name: Scan pushed image with Trivy
-        uses: aquasecurity/trivy-action@v0.9.3
+        # Pin to the maintained major release tag to avoid missing patch tags
+        uses: aquasecurity/trivy-action@v1
         with:
           image-ref: ${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
           format: 'table'
           exit-code: '1' # non-zero exit if vulnerabilities found (customize severity behavior in Trivy config)
 
       - name: Sign image with Cosign (keyless)
-        uses: sigstore/cosign-action@v2
+        # Use the stable action major tag. If this still errors, try @main or @latest
+        uses: sigstore/cosign-action@v1
         with:
           keyless: true
           image: ${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
