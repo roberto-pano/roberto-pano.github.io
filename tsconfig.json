@@ -2,15 +2,31 @@
   "extends": "@react-native/typescript-config/tsconfig.json",
   "compilerOptions": {
     "jsx": "react-native",
-    "types": ["react", "react-native"],
+  "types": ["react", "react-native", "jest", "node"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "lib": ["ESNext", "DOM"],
-    "moduleResolution": "node",
+  "lib": ["ESNext", "DOM"],
+  "module": "nodenext",
+  "moduleResolution": "nodenext",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
     "noEmit": true,
     "strict": true,
     "target": "esnext"
   }
+  ,
+  "exclude": [
+    "vite.config.ts",
+    "vite.config.*",
+    "tailwind.config.ts",
+    "site/vite.config.ts",
+    "**/*.config.ts",
+    "node_modules",
+    "2.6.0",
+    "gems"
+  ]
 }

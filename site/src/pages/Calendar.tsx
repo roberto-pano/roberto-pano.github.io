@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
 type EventItem = {
   id: string;
@@ -57,15 +57,15 @@ export default function Calendar() {
     const startDay = start.getDay();
     const prevEnd = new Date(dt.getFullYear(), dt.getMonth(), 0).getDate();
     for (let i = startDay; i > 0; i--) {
-      days.push({num: prevEnd - i + 1, currentMonth: false});
+      days.push({ num: prevEnd - i + 1, currentMonth: false });
     }
     for (let i = 1; i <= end.getDate(); i++) {
-      days.push({num: i, currentMonth: true});
+      days.push({ num: i, currentMonth: true });
     }
     const endDay = end.getDay();
     const nextDays = 6 - endDay;
     for (let i = 1; i <= nextDays; i++) {
-      days.push({num: i, currentMonth: false});
+      days.push({ num: i, currentMonth: false });
     }
     return days;
   }
@@ -131,7 +131,7 @@ export default function Calendar() {
 
   return (
     <div>
-      <h2 style={{textAlign: 'center'}}>
+      <h2 style={{ textAlign: 'center' }}>
         {monthNames[displayDate.getMonth()]} {displayDate.getFullYear()}
       </h2>
       <div
@@ -150,7 +150,7 @@ export default function Calendar() {
       </div>
 
       <div
-        style={{display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 6}}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 6 }}
         className="num_days">
         {days.map((d, idx) => (
           <div
@@ -170,7 +170,7 @@ export default function Calendar() {
               background:
                 selectedDay === d.num && d.currentMonth ? '#eef' : undefined,
             }}>
-            <div style={{fontWeight: 600}}>{d.num}</div>
+            <div style={{ fontWeight: 600 }}>{d.num}</div>
             {d.currentMonth &&
               (() => {
                 const evs = eventsForDay(
@@ -179,7 +179,7 @@ export default function Calendar() {
                   d.num,
                 );
                 return evs.slice(0, 2).map(e => (
-                  <div key={e.id} style={{fontSize: 12}}>
+                  <div key={e.id} style={{ fontSize: 12 }}>
                     {e.time ? `${e.time} — ` : ''}
                     {e.name}
                   </div>
@@ -189,13 +189,13 @@ export default function Calendar() {
         ))}
       </div>
 
-      <div style={{marginTop: 20}}>
+      <div style={{ marginTop: 20 }}>
         <h3>Day details</h3>
         {selectedDay == null ? (
           <div>Select a day to see/add events.</div>
         ) : (
           <div>
-            <div style={{marginBottom: 8}}>Selected: {selectedDay}</div>
+            <div style={{ marginBottom: 8 }}>Selected: {selectedDay}</div>
             <div>
               {eventsForDay(
                 displayDate.getFullYear(),
@@ -204,24 +204,24 @@ export default function Calendar() {
               ).map(ev => (
                 <div
                   key={ev.id}
-                  style={{borderBottom: '1px solid #ddd', padding: 6}}>
-                  <div style={{fontWeight: 700}}>
+                  style={{ borderBottom: '1px solid #ddd', padding: 6 }}>
+                  <div style={{ fontWeight: 700 }}>
                     {ev.time ? `${ev.time} ` : ''}
                     {ev.name}
                   </div>
-                  <div style={{fontSize: 12, color: '#666'}}>
+                  <div style={{ fontSize: 12, color: '#666' }}>
                     Owner: {ev.owner}
                   </div>
                   <button
                     onClick={() => removeEvent(ev.id)}
-                    style={{marginTop: 6}}>
+                    style={{ marginTop: 6 }}>
                     Delete
                   </button>
                 </div>
               ))}
             </div>
 
-            <div style={{marginTop: 12}}>
+            <div style={{ marginTop: 12 }}>
               <input
                 placeholder="Event name"
                 value={newName}
@@ -231,9 +231,9 @@ export default function Calendar() {
                 placeholder="Time (optional)"
                 value={newTime}
                 onChange={e => setNewTime(e.target.value)}
-                style={{marginLeft: 8}}
+                style={{ marginLeft: 8 }}
               />
-              <button onClick={addEvent} style={{marginLeft: 8}}>
+              <button onClick={addEvent} style={{ marginLeft: 8 }}>
                 Add
               </button>
             </div>
@@ -241,7 +241,7 @@ export default function Calendar() {
         )}
       </div>
 
-      <div style={{marginTop: 20}}>
+      <div style={{ marginTop: 20 }}>
         <h3>Account</h3>
         {username ? (
           <div>
@@ -265,7 +265,7 @@ export default function Calendar() {
                   login(el.value);
                 }
               }}
-              style={{marginLeft: 8}}>
+              style={{ marginLeft: 8 }}>
               Sign in
             </button>
           </div>

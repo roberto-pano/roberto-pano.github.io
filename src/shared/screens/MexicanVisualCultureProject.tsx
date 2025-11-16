@@ -1,14 +1,11 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  Modal,
-  Image,
-  StyleSheet,
-  Platform,
-  TouchableOpacity,
-} from 'react-native';
-import {Gallery} from '../../shared/components/Gallery';
+import React, { useState } from 'react';
+// CSS module used for the web modal. The module lives under `site/src/pages`.
+// We import it directly so the web variant can use the styles.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - CSS module path outside src; type declared in src/types/global.d.ts
+import modalStyles from '../../../site/src/pages/Modal.module.css';
+import { View, Text, Modal, Image, StyleSheet, Platform, TouchableOpacity } from 'react-native';
+import { Gallery } from '../../shared/components/Gallery';
 
 const IMAGES = [
   {
@@ -29,16 +26,13 @@ const IMAGES = [
 ];
 
 export default function MexicanVisualCultureProject() {
-  const [selectedImage, setSelectedImage] = useState<null | (typeof IMAGES)[0]>(
-    null,
-  );
+  const [selectedImage, setSelectedImage] = useState<null | (typeof IMAGES)[0]>(null);
 
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Virtual Art Exhibit</Text>
       <Text style={styles.description}>
-        The theme of the overall exhibit is an exploration into dual identity
-        and how Mexican-American and Chicano/a/x artists express identity
+        The theme of the overall exhibit is an exploration into dual identity and how Mexican-American and Chicano/a/x artists express identity
         through various mediums and art styles.
       </Text>
 
@@ -47,35 +41,19 @@ export default function MexicanVisualCultureProject() {
       {Platform.OS === 'web' ? (
         // Web modal with CSS module styles
         selectedImage && (
-          <div
-            className={modalStyles.modal}
-            onClick={() => setSelectedImage(null)}>
+          <div className={modalStyles.modal} onClick={() => setSelectedImage(null)}>
             <span className={modalStyles.modalClose}>&times;</span>
-            <img
-              className={modalStyles.modalContent}
-              src={selectedImage.src}
-              alt={selectedImage.alt}
-            />
+            <img className={modalStyles.modalContent} src={selectedImage.src} alt={selectedImage.alt} />
             <div className={modalStyles.modalCaption}>{selectedImage.alt}</div>
           </div>
         )
       ) : (
         // React Native modal
-        <Modal
-          visible={!!selectedImage}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setSelectedImage(null)}>
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            onPress={() => setSelectedImage(null)}>
+        <Modal visible={!!selectedImage} transparent animationType="fade" onRequestClose={() => setSelectedImage(null)}>
+          <TouchableOpacity style={styles.modalOverlay} onPress={() => setSelectedImage(null)}>
             {selectedImage && (
               <View style={styles.modalContent}>
-                <Image
-                  source={{uri: selectedImage.src}}
-                  style={styles.modalImage}
-                  resizeMode="contain"
-                />
+                <Image source={{ uri: selectedImage.src }} style={styles.modalImage} resizeMode="contain" />
                 <Text style={styles.modalCaption}>{selectedImage.alt}</Text>
               </View>
             )}

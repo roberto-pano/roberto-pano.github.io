@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {NavLink} from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 
 export default function Header() {
   useEffect(() => {
@@ -30,32 +30,32 @@ export default function Header() {
       <NavLink
         to="/"
         end
-        className={({isActive}) => (isActive ? 'active' : '')}>
+        className={({ isActive }) => (isActive ? 'active' : '')}>
         Home
       </NavLink>
       <NavLink
         to="/about"
-        className={({isActive}) => (isActive ? 'active' : '')}>
+        className={({ isActive }) => (isActive ? 'active' : '')}>
         About
       </NavLink>
       <NavLink
         to="/projects"
-        className={({isActive}) => (isActive ? 'active' : '')}>
+        className={({ isActive }) => (isActive ? 'active' : '')}>
         Projects
       </NavLink>
       <NavLink
         to="/contact"
-        className={({isActive}) => (isActive ? 'active' : '')}>
+        className={({ isActive }) => (isActive ? 'active' : '')}>
         Contact
       </NavLink>
       <NavLink
         to="/calendar"
-        className={({isActive}) => (isActive ? 'active' : '')}>
+        className={({ isActive }) => (isActive ? 'active' : '')}>
         Calendar
       </NavLink>
       <NavLink
         to="/mexicanvisualcultureproject"
-        className={({isActive}) => (isActive ? 'active' : '')}>
+        className={({ isActive }) => (isActive ? 'active' : '')}>
         Mexican Visual Culture Final Project
       </NavLink>
     </nav>

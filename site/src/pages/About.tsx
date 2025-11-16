@@ -6,8 +6,9 @@ export default function About() {
       <h2>About</h2>
       <p>About me section</p>
       <p>
-        You can customize this with the full HTML content from{' '}
-        <code>old-site/aboutme.html</code> or replace this with richer JSX.
+        This is a placeholder page. Replace this content with your preferred JSX
+        for the About section or import/migrate any archived content from the
+        `cosmic-pony/old-site-archived/` folder if needed.
       </p>
     </div>
   );

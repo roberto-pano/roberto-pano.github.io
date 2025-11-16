@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+public/
+cosmic-pony/old-site-archived/
+site/assets/
+site/src/assets/
+site/assets/JavaScript Calendar/
+site/src/
+**/*.min.js
+*.bundle.js

@@ -1,0 +1,22 @@
+name: Secret scan (gitleaks)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  gitleaks-scan:
+    name: Run Gitleaks secret scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Gitleaks
+        uses: zricethezav/gitleaks-action@v2.8.0
+        with:
+          args: --verbose --redact

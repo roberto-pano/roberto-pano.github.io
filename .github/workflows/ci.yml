@@ -1,0 +1,82 @@
+name: CI (ECR + OIDC + Scan + Sign)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: cosmic-pony-ci
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC (assume role)
+        id: aws-creds
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }} # set this in your repo secrets (arn:aws:iam::123456789012:role/YourRole)
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Get AWS account ID
+        id: get-account
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          echo "account_id=${ACCOUNT_ID}" >> $GITHUB_OUTPUT
+
+      - name: Ensure ECR repository exists
+        run: |
+          aws ecr describe-repositories --repository-names "${{ env.ECR_REPOSITORY }}" --region ${{ env.AWS_REGION }} || \
+            aws ecr create-repository --repository-name "${{ env.ECR_REPOSITORY }}" --region ${{ env.AWS_REGION }}
+
+      - name: Build and tag Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          IMAGE_NAME=${ECR_REGISTRY}/${{ env.ECR_REPOSITORY }}:${IMAGE_TAG}
+          docker build --pull -t ${IMAGE_NAME} .
+          echo "Pushing ${IMAGE_NAME}"
+          docker push ${IMAGE_NAME}
+
+      - name: Scan pushed image with Trivy
+        uses: aquasecurity/trivy-action@v0.9.3
+        with:
+          image-ref: ${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          format: 'table'
+          exit-code: '1' # non-zero exit if vulnerabilities found (customize severity behavior in Trivy config)
+
+      - name: Sign image with Cosign (keyless)
+        uses: sigstore/cosign-action@v2
+        with:
+          keyless: true
+          image: ${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+
+      - name: Pull and run CI inside the signed image
+        run: |
+          IMAGE=${{ steps.get-account.outputs.account_id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          docker pull ${IMAGE}
+          # run the same CI commands that the Dockerfile CMD would run (pnpm inside image)
+          docker run --rm ${IMAGE} sh -c "pnpm run lint && pnpm run typecheck && pnpm test && pnpm run build"
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: dist/
+
