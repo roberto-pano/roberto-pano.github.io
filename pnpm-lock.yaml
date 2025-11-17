@@ -70,8 +70,8 @@ importers:
         specifier: 18.0.1
         version: 18.0.1
       '@react-native-community/cli-platform-ios':
-        specifier: 18.0.1
-        version: 18.0.1
+        specifier: 20.0.2
+        version: 20.0.2
       '@react-native/babel-preset':
         specifier: 0.82.1
         version: 0.82.1(@babel/core@7.28.5)
@@ -1434,6 +1434,9 @@ packages:
   '@react-native-community/cli-config-apple@18.0.1':
     resolution: {integrity: sha512-ybr1ZrOSd/Z+oCJ1qVSKVQauvneObTu3VjvYPhhrme7tUUSaYmd3iikaWonbKk5rVp+2WqOFR6Cy7XqVfwwG8A==}
 
+  '@react-native-community/cli-config-apple@20.0.2':
+    resolution: {integrity: sha512-6MLL9Duu/JytqI6XfYuc78LSkRGfJoCqTSfqTJzBNSnz6S7XJps9spGBlgvrGh/j0howBpQlFH0J8Ws4N4mCxA==}
+
   '@react-native-community/cli-config@18.0.1':
     resolution: {integrity: sha512-O4DDJVMx+DYfwEgF/6lB4hoI9sVjrYW6AlLqeJY/D2XH2e4yqK/Pr3SAi4sOMgvjvYZKzLHqIQVxx54v+LyMQA==}
 
@@ -1446,14 +1449,23 @@ packages:
   '@react-native-community/cli-platform-apple@18.0.1':
     resolution: {integrity: sha512-7WxGXT/ui7VtyLVjx5rkYkkTMlbufI6p5BdRKjGp/zQDnDzs/0rle0JEHJxwgvs5VQnt+VOnHBMipkQAhydIqQ==}
 
+  '@react-native-community/cli-platform-apple@20.0.2':
+    resolution: {integrity: sha512-PdsQVFLY+wGnAN1kZ38XzzWiUlqaG1cXdpkQ1rYaiiNu3PVTc2/KtteLcPG/wbApbfoPggQ/ffh+JGg7NL+HNw==}
+
   '@react-native-community/cli-platform-ios@18.0.1':
     resolution: {integrity: sha512-GtO1FB+xaz+vcHIdvl94AkD5B8Y+H8XHb6QwnYX+A3WwteGsHrR8iD/bLLcRtNPtLaAWMa/RgWJpgs4KG+eU4w==}
+
+  '@react-native-community/cli-platform-ios@20.0.2':
+    resolution: {integrity: sha512-bVOqLsBztT+xVV65uztJ7R/dtjj4vaPXJU1RLi35zLtr1APAxzf+2ydiixxtBjNFylM3AZlF8iL5WXjeWVqrmA==}
 
   '@react-native-community/cli-server-api@18.0.1':
     resolution: {integrity: sha512-ZRy2IjEM4ljP05bZcnXho0sCxVGI/9SkWkLuzXl+cRu/4I8vLRleihn2GJCopg82QHLLrajUCHhpDKE8NJWcRw==}
 
   '@react-native-community/cli-tools@18.0.1':
     resolution: {integrity: sha512-WxWFXwfYhHR2eYiB4lkHZVC/PmIkRWeVHBQKmn0h1mecr3GrHYO4BzW1jpD5Xt6XZ9jojQ9wE5xrCqXjiMSAIQ==}
+
+  '@react-native-community/cli-tools@20.0.2':
+    resolution: {integrity: sha512-bPYhRYggW9IIM8pvrZF/0r6HaxCyEWDn6zfPQPMWlkQUwkzFZ8GBY/M7yiHgDzozWKPT4DqZPumrq806Vcksow==}
 
   '@react-native-community/cli-types@18.0.1':
     resolution: {integrity: sha512-pGxr/TSP9Xiw2+9TUn3OWLdcuI4+PJozPsCYZVTGWJ96X6Pv7YX/rNy4emIDkaWaFZ7IWgWXUA725KhEINSf3Q==}
@@ -6130,6 +6142,13 @@ snapshots:
       execa: 5.1.1
       fast-glob: 3.3.3
 
+  '@react-native-community/cli-config-apple@20.0.2':
+    dependencies:
+      '@react-native-community/cli-tools': 20.0.2
+      chalk: 4.1.2
+      execa: 5.1.1
+      fast-glob: 3.3.3
+
   '@react-native-community/cli-config@18.0.1(typescript@5.0.4)':
     dependencies:
       '@react-native-community/cli-tools': 18.0.1
@@ -6177,9 +6196,21 @@ snapshots:
       execa: 5.1.1
       fast-xml-parser: 4.5.3
 
+  '@react-native-community/cli-platform-apple@20.0.2':
+    dependencies:
+      '@react-native-community/cli-config-apple': 20.0.2
+      '@react-native-community/cli-tools': 20.0.2
+      chalk: 4.1.2
+      execa: 5.1.1
+      fast-xml-parser: 4.5.3
+
   '@react-native-community/cli-platform-ios@18.0.1':
     dependencies:
       '@react-native-community/cli-platform-apple': 18.0.1
+
+  '@react-native-community/cli-platform-ios@20.0.2':
+    dependencies:
+      '@react-native-community/cli-platform-apple': 20.0.2
 
   '@react-native-community/cli-server-api@18.0.1':
     dependencies:
@@ -6199,6 +6230,19 @@ snapshots:
       - utf-8-validate
 
   '@react-native-community/cli-tools@18.0.1':
+    dependencies:
+      '@vscode/sudo-prompt': 9.3.1
+      appdirsjs: 1.2.7
+      chalk: 4.1.2
+      execa: 5.1.1
+      find-up: 5.0.0
+      launch-editor: 2.12.0
+      mime: 2.6.0
+      ora: 5.4.1
+      prompts: 2.4.2
+      semver: 7.7.3
+
+  '@react-native-community/cli-tools@20.0.2':
     dependencies:
       '@vscode/sudo-prompt': 9.3.1
       appdirsjs: 1.2.7
