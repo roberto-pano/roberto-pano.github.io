@@ -68,7 +68,7 @@ jobs:
 
       - name: Upload Trivy JSON report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: trivy-report
           path: trivy-report.json
@@ -133,7 +133,7 @@ jobs:
 
       - name: Upload build artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: web-build
           path: dist/
